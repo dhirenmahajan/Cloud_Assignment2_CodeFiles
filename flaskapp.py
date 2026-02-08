@@ -4,12 +4,11 @@ from flask import Flask, render_template, request, redirect, url_for, send_from_
 
 app = Flask(__name__)
 
-# Use relative paths so this runs on GitHub/Local/AWS without changes
+# Use relative paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'mydatabase.db')
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 
-# Create uploads folder if it doesn't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def get_db_connection():
@@ -23,34 +22,47 @@ def index():
 
 @app.route('/register', methods=['POST'])
 def register():
-    # Collect data form input
+    # Collect data (No file handling here anymore)
     data = (
         request.form['username'], request.form['password'],
         request.form['firstname'], request.form['lastname'],
         request.form['email'], request.form['address']
     )
     
-    # Handle File Upload
+    # Save user to database
+    conn = get_db_connection()
+    try:
+        conn.execute('INSERT INTO users (username, password, firstname, lastname, email, address) VALUES (?, ?, ?, ?, ?, ?)', data)
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+    finally:
+        conn.close()
+
+    # Redirect to profile (Word count is None initially)
+    return render_template('profile.html', user=request.form, word_count=None)
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    username = request.form['username']
     file = request.files['file']
-    word_count = 0
+    word_count = "N/A"
+    
     if file:
         file_path = os.path.join(UPLOAD_FOLDER, 'Limerick.txt')
         file.save(file_path)
-        # Calculate word count
         try:
             with open(file_path, 'r') as f:
                 word_count = len(f.read().split())
         except Exception as e:
             print(f"Error reading file: {e}")
 
-    # Save user to database
+    # Re-fetch user details to render the profile page correctly
     conn = get_db_connection()
-    conn.execute('INSERT INTO users (username, password, firstname, lastname, email, address) VALUES (?, ?, ?, ?, ?, ?)', data)
-    conn.commit()
+    user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
     conn.close()
 
-    # Redirect to profile to display details
-    return render_template('profile.html', user=request.form, word_count=word_count)
+    return render_template('profile.html', user=user, word_count=word_count)
 
 @app.route('/login_page')
 def login_page():
@@ -64,7 +76,14 @@ def login():
     user = conn.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, password)).fetchone()
     conn.close()
     if user:
-        return render_template('profile.html', user=user, word_count="N/A (Retrieved)")
+        # Check if file exists to display current count
+        word_count = "N/A (Upload to Calculate)"
+        file_path = os.path.join(UPLOAD_FOLDER, 'Limerick.txt')
+        if os.path.exists(file_path):
+             with open(file_path, 'r') as f:
+                word_count = len(f.read().split())
+                
+        return render_template('profile.html', user=user, word_count=word_count)
     return "Invalid Login"
 
 @app.route('/download')
