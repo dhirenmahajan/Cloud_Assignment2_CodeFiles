@@ -6,12 +6,10 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .container { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 400px; }
         h2 { text-align: center; color: #333; }
-        input[type="text"], input[type="password"], input[type="email"], input[type="file"] { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        input[type="text"], input[type="password"], input[type="email"] { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
         input[type="submit"] { width: 100%; background-color: #4CAF50; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
         input[type="submit"]:hover { background-color: #45a049; }
         label { color: #666; font-size: 0.9em; font-weight: bold; }
-        
-        /* New Login Button Style */
         .btn-login { display: block; width: 100%; background-color: #008CBA; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; text-decoration: none; box-sizing: border-box; text-align: center; }
         .btn-login:hover { background-color: #007bb5; }
     </style>
@@ -19,14 +17,13 @@
 <body>
     <div class="container">
         <h2>Create Account</h2>
-        <form method="POST" action="/register" enctype="multipart/form-data">
+        <form method="POST" action="/register">
             <label>Username</label> <input type="text" name="username" required placeholder="Choose a username">
             <label>Password</label> <input type="password" name="password" required placeholder="Choose a password">
             <label>First Name</label> <input type="text" name="firstname" required placeholder="John">
             <label>Last Name</label> <input type="text" name="lastname" required placeholder="Doe">
             <label>Email</label> <input type="email" name="email" required placeholder="john@example.com">
             <label>Address</label> <input type="text" name="address" required placeholder="123 Main St">
-            <label>Upload Limerick.txt</label> <input type="file" name="file" required>
             <input type="submit" value="Register Now">
         </form>
         <a href="/login_page" class="btn-login">Go to Login</a>
