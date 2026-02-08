@@ -11,10 +11,13 @@
         .content p { border-bottom: 1px solid #eee; padding-bottom: 8px; margin: 10px 0; }
         .content strong { color: #333; display: inline-block; width: 100px; }
         .footer { background-color: #f9f9f9; padding: 20px; text-align: center; border-top: 1px solid #eee; }
+        .upload-section { margin-top: 15px; padding-top: 15px; border-top: 2px dashed #ddd; text-align: center; }
         .btn { display: inline-block; padding: 10px 20px; margin: 5px; border-radius: 4px; text-decoration: none; font-size: 14px; cursor: pointer; }
         .btn-download { background-color: #ff9800; color: white; border: none; }
+        .btn-upload { background-color: #4CAF50; color: white; border: none; width: 100%; margin-top: 10px;}
         .btn-login { color: #008CBA; border: 1px solid #008CBA; background: transparent; }
         .btn:hover { opacity: 0.9; }
+        input[type="file"] { margin: 10px 0; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -26,7 +29,23 @@
             <p><strong>Name:</strong> {{ user.firstname }} {{ user.lastname }}</p>
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p><strong>Address:</strong> {{ user.address }}</p>
-            <p><strong>Word Count:</strong> <span style="color: #d32f2f; font-weight: bold;">{{ word_count }}</span></p>
+            
+            <p><strong>Word Count:</strong> 
+                {% if word_count %}
+                    <span style="color: #d32f2f; font-weight: bold;">{{ word_count }}</span>
+                {% else %}
+                    <span>Not Uploaded</span>
+                {% endif %}
+            </p>
+
+            <div class="upload-section">
+                <strong>Upload Limerick.txt</strong>
+                <form action="/upload" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="username" value="{{ user.username }}">
+                    <input type="file" name="file" required>
+                    <input type="submit" value="Upload & Calculate" class="btn btn-upload">
+                </form>
+            </div>
         </div>
         <div class="footer">
             <a href="/download"><button class="btn btn-download">Download Limerick.txt</button></a>
